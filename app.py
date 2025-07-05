@@ -124,7 +124,7 @@ def create_range_bar_chart(range_min, range_max, bar_start, bar_end, start_value
     
     fig.update_layout(
         height=70,
-        margin=dict(l=30, r=30, t=25, b=0),
+        margin=dict(l=30, r=30, t=12, b=12),
         paper_bgcolor="white",
         plot_bgcolor="white",
         xaxis=dict(showticklabels=False, showgrid=False, zeroline=False, range=[range_min, range_max]),
@@ -170,29 +170,36 @@ st.title("Metrics Dashboard")
 # Fetch data
 data = get_data()
 
-# A single container for all metric rows
-with st.container():
-    # Apply a border and padding using custom HTML/CSS
-    st.markdown("""
-    <div style="border: 1px solid #e6e6e6; border-radius: 10px; padding: 15px;">
-    """, unsafe_allow_html=True)
-
-    for index, metric in enumerate(data):
-        col1, col2 = st.columns([3, 9], vertical_alignment="center")
+# Loop through data and create a bordered container for each metric
+for metric in data:
+    with st.container(border=True):
+        col1, col2, col3, col4 = st.columns([2.5, 1, 1, 7.5], vertical_alignment="center")
 
         with col1:
-            st.markdown(f"<p style='font-size: 1.25rem; font-weight: bold; text-align: left;'>{metric['title']}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='font-size: clamp(1.0rem, 1.5vw, 1.25rem); font-weight: bold; text-align: left;'>{metric['title']}</p>", unsafe_allow_html=True)
         
         with col2:
+            st.markdown(f"<p style='font-size: clamp(1.5rem, 2.5vw, 2.5rem); text-align: center;'>{metric['current_value']:.1f}</p>", unsafe_allow_html=True)
+
+        with col3:
+            # Calculate percentage change
+            start_val = metric['start_value']
+            current_val = metric['current_value']
+            
+            if current_val != 0:
+                pct_change = ((current_val - start_val) / current_val) * 100
+                color = "green" if pct_change >= 0 else "red"
+                symbol = "▲" if pct_change >= 0 else "▼"
+                st.markdown(f"<p style='font-size: clamp(1.0rem, 1.5vw, 1.25rem); color: {color}; text-align: center;'>{symbol} {pct_change:.1f}%</p>", unsafe_allow_html=True)
+            else:
+                st.markdown(f"<p style='font-size: clamp(1.0rem, 1.5vw, 1.25rem); text-align: center;'>-</p>", unsafe_allow_html=True)
+
+
+        with col4:
             chart = create_range_bar_chart(
                 metric["range_min"], metric["range_max"], 
                 metric["bar_start"], metric["bar_end"],
-                metric["start_value"], metric["current_value"]
+                metric["start_value"],
+                metric["current_value"]
             )
-            st.plotly_chart(chart, use_container_width=True, config={'displayModeBar': False})
-        
-        if index < len(data) - 1:
-            st.divider()
-
-    # Close the custom div
-    st.markdown("</div>", unsafe_allow_html=True) 
+            st.plotly_chart(chart, use_container_width=True, config={'displayModeBar': False}) 
