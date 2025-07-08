@@ -2,17 +2,95 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
+import requests
+import json
+import pandas as pd
+import math
+from datetime import datetime
+
+def get_rounding_precision(range_min, range_max):
+    """
+    Calculates the number of decimal places for rounding based on
+    2 significant digits of the range difference.
+    """
+    if range_max == range_min:
+        return 2
+
+    diff = abs(range_max - range_min)
+    if diff <= 0:
+        return 2
+
+    precision = 2 - math.floor(math.log10(diff))
+    return max(0, min(10, precision))
+
 
 # --- Data Simulation ---
 def get_data():
-    """Simulates fetching data from an API for range bars."""
-    return [
-        {"id": 1, "title": "Price Quantile ", "info_url": "https://example.com/price-quantile", "range_min": 0, "range_max": 100, "bar_start": 15, "bar_end": 37, "start_value": 15, "current_value": 28, "suffix": "%"},
-        {"id": 2, "title": "Momentum Z-Index", "info_url": "https://example.com/momentum", "range_min": -3, "range_max": 3, "bar_start": -0.05, "bar_end": 1.16, "start_value": 0.35, "current_value": 0.4},
-        {"id": 3, "title": "Volatility", "info_url": "https://example.com/volatility", "range_min": 0, "range_max": 100, "bar_start": 40, "bar_end": 80, "start_value": 50, "current_value": 70, "suffix": "%"},
-        {"id": 4, "title": "Optimal Leverage", "info_url": "https://example.com/leverage", "range_min": 0.0, "range_max": 2, "bar_start": 0.7, "bar_end": 1.5, "start_value": 0.8, "current_value": 1.2, "suffix": "x"},
-        {"id": 5, "title": "MVRV", "info_url": "https://example.com/mvrv", "range_min": 0.5, "range_max": 3.5, "bar_start": 1.8, "bar_end": 2.5, "start_value": 2.5, "current_value": 1.8},
+    
+    # Get data from API
+    response = requests.get('https://python-server-e4a8c032b69c.herokuapp.com/bitcoin-data')
+    priceData = response.json()
+    #--------------------------------
+    # Extract Momentum Z-Index
+
+    # Convert price history to DataFrame
+    df_plrr = pd.DataFrame(priceData['price_history'])
+
+
+    #Get latest value
+    plrr_latest = df_plrr.iloc[-1]['value']
+    #Get 30d prior value
+    plrr_30d_prior = df_plrr.iloc[-30]['value']
+    # Get 1yr range
+    plrr_1yr_range = df_plrr.iloc[-365:]['value']
+    # max and min of 1yr range
+    plrr_1yr_range_max = plrr_1yr_range.max()
+    plrr_1yr_range_min = plrr_1yr_range.min()
+
+    #--------------------------------
+    # Extract Price Quantile
+    df_quantile_index = pd.DataFrame(priceData['quantile_index'])
+    quantile_index_latest = df_quantile_index.iloc[-1]['value']*100
+    quantile_index_30d_prior = df_quantile_index.iloc[-30]['value']*100
+    quantile_index_1yr_range = df_quantile_index.iloc[-365:]['value']*100
+    quantile_index_1yr_range_max = quantile_index_1yr_range.max()
+    quantile_index_1yr_range_min = quantile_index_1yr_range.min()
+
+
+    #--------------------------------
+    # Extract Volatility
+    # Make GET request to API endpoint
+    response = requests.get('https://python-server-e4a8c032b69c.herokuapp.com/volatility')
+    volatilityData = response.json()
+    df_volatility = pd.DataFrame(volatilityData['historical'])
+    volatility_latest = df_volatility.iloc[-1]['volatility']*100
+    volatility_30d_prior = df_volatility.iloc[-30]['volatility']*100
+    volatility_1yr_range = df_volatility.iloc[-365:]['volatility']*100
+    volatility_1yr_range_max = volatility_1yr_range.max()
+    volatility_1yr_range_min = volatility_1yr_range.min()
+    #--------------------------------
+
+    #--------------------------------
+    # Extract Optimal Leverage
+    days_since_genesis = (datetime.now() - datetime(2009, 1, 3)).days
+    PLR = 5.7*np.log(1+365/(days_since_genesis+np.arange(-365,0)))
+    Leverage = (PLR/df_volatility.iloc[-365:]['volatility']**1.5).to_numpy()+0.2*(df_plrr.iloc[-365:]['value'].to_numpy())/(df_volatility.iloc[-365:]['volatility']).to_numpy()
+    Leverage_latest = Leverage[-1]
+    Leverage_30d_prior = Leverage[-30]
+    Leverage_1yr_range = Leverage[-365:]
+    Leverage_1yr_range_max = Leverage_1yr_range.max()
+    Leverage_1yr_range_min = Leverage_1yr_range.min()
+
+    output = [
+        {"id": 1, "title": "Price Quantile ", "info_url": "https://example.com/price-quantile", "range_min": 0, "range_max": 100, "bar_start": quantile_index_1yr_range_min, "bar_end": quantile_index_1yr_range_max, "start_value": quantile_index_30d_prior, "current_value": quantile_index_latest, "suffix": "%"},
+        {"id": 2, "title": "Momentum Z-Index", "info_url": "https://example.com/momentum", "range_min": -3, "range_max": 3, "bar_start": plrr_1yr_range_min, "bar_end": plrr_1yr_range_max, "start_value": plrr_30d_prior, "current_value": plrr_latest},
+        {"id": 3, "title": "Volatility", "info_url": "https://example.com/volatility", "range_min": 0, "range_max": 100, "bar_start": volatility_1yr_range_min, "bar_end": volatility_1yr_range_max, "start_value": volatility_30d_prior, "current_value": volatility_latest, "suffix": "%"}
+        # {"id": 4, "title": "Optimal Leverage", "info_url": "https://example.com/leverage", "range_min": 0.0, "range_max": 2.3, "bar_start": Leverage_1yr_range_min, "bar_end": Leverage_1yr_range_max, "start_value": Leverage_30d_prior, "current_value": Leverage_latest, "suffix": "x"},
+        # {"id": 5, "title": "MVRV", "info_url": "https://example.com/mvrv", "range_min": 0.5, "range_max": 3.5, "bar_start": 1.8, "bar_end": 2.5, "start_value": 2.5, "current_value": 1.8},
     ]
+
+
+    return output
 
 def get_color_from_scale(value, range_min, range_max):
     """Calculates a color from a green-yellow-red scale based on a value."""
@@ -130,6 +208,9 @@ def create_range_bar_chart(range_min, range_max, bar_start, bar_end, start_value
     padded_min = range_min - padding
     padded_max = range_max + padding
 
+    precision = get_rounding_precision(range_min, range_max)
+    tick_format = f".{precision}f"
+
     fig.update_layout(
         height=90,
         margin=dict(l=1, r=1, t=1, b=30),
@@ -142,7 +223,8 @@ def create_range_bar_chart(range_min, range_max, bar_start, bar_end, start_value
             range=[padded_min, padded_max],
             ticks="outside",
             tickcolor='lightgrey',
-            tickfont=dict(size=10, color='grey')
+            tickfont=dict(size=10, color='grey'),
+            tickformat=tick_format
         ),
         yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, range=[-0.2, 0.8]),
         showlegend=False,
@@ -171,7 +253,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# st.title("Metrics Dashboard")
+st.title("Valuation Metrics")
 
 # Fetch data
 data = get_data()
@@ -181,6 +263,7 @@ for metric in data:
     with st.container(border=True):
         col1, col2, col3, col4 = st.columns([2.5, 1, 1, 6.5], vertical_alignment="center")
         suffix = metric.get("suffix", "")
+        precision = get_rounding_precision(metric['range_min'], metric['range_max'])
 
         with col1:
             info_url = metric.get("info_url")
@@ -201,20 +284,18 @@ for metric in data:
             """, unsafe_allow_html=True)
         
         with col2:
-            st.markdown(f"<p style='font-size: clamp(1.2rem, 2vw, 2.2rem); text-align: center;'>{metric['current_value']:.1f}{suffix}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='font-size: clamp(1.2rem, 2vw, 2.2rem); text-align: center;'>{metric['current_value']:.{precision}f}{suffix}</p>", unsafe_allow_html=True)
 
         with col3:
-            # Calculate percentage change
+            # Calculate absolute change
             start_val = metric['start_value']
             current_val = metric['current_value']
             
-            if current_val != 0:
-                pct_change = ((current_val - start_val) / current_val) * 100
-                color = "green" if pct_change >= 0 else "red"
-                symbol = "▲" if pct_change >= 0 else "▼"
-                st.markdown(f"<p style='font-size: clamp(0.8rem, 1.2vw, 1.0rem); color: {color}; text-align: center;'>{symbol} {pct_change:.1f}%</p>", unsafe_allow_html=True)
-            else:
-                st.markdown(f"<p style='font-size: clamp(0.8rem, 1.2vw, 1.0rem); text-align: center;'>-</p>", unsafe_allow_html=True)
+            absolute_change = current_val - start_val
+            color = "green" if absolute_change >= 0 else "red"
+            symbol = "▲" if absolute_change >= 0 else "▼"
+            
+            st.markdown(f"<p style='font-size: clamp(0.8rem, 1.2vw, 1.0rem); color: {color}; text-align: center;'>{symbol} {absolute_change:.{precision}f}{suffix}</p>", unsafe_allow_html=True)
 
 
         with col4:
