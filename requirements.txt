@@ -1,4 +1,6 @@
 streamlit
 plotly
-streamlit-elements
 pandas
+numpy
+requests
+gunicorn
