@@ -253,6 +253,14 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+st.markdown("""
+    <style>
+        .stMainBlockContainer {
+            padding: 0px;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
 st.title("Valuation Metrics")
 
 # Fetch data
