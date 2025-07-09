@@ -261,7 +261,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.title("Valuation Metrics")
+st.subheader("Risk Metrics")
 
 # Fetch data
 data = get_data()
