@@ -278,8 +278,12 @@ for metric in data:
             info_icon_html = f"""
                 <a href="{info_url}" target="_blank" style="text-decoration: none; padding: 4px 0px;">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M8 1.5C4.41 1.5 1.5 4.41 1.5 8C1.5 11.59 4.41 14.5 8 14.5C11.59 14.5 14.5 11.59 14.5 8C14.5 4.41 11.59 1.5 8 1.5ZM8 0.5C12.1421 0.5 15.5 3.85786 15.5 8C15.5 12.1421 12.1421 15.5 8 15.5C3.85786 15.5 0.5 12.1421 0.5 8C0.5 3.85786 3.85786 0.5 8 0.5Z" fill="#a0a0a0"/>
-                        <path d="M7.5 11.5H8.5V7.5H7.5V11.5ZM8 6.5C8.55228 6.5 9 6.05228 9 5.5C9 4.94772 8.55228 4.5 8 4.5C7.44772 4.5 7 4.94772 7 5.5C7 6.05228 7.44772 6.5 8 6.5Z" fill="#a0a0a0"/>
+                        <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h11A1.5 1.5 0 0 1 15 2.5v11a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 13.5v-11z" fill="none" stroke="#a0a0a0" stroke-width="1"/>
+                        <path d="M3 12l2.5-3L8 11l2.5-4L14 9" fill="none" stroke="#a0a0a0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="5.5" cy="9" r="1" fill="#a0a0a0"/>
+                        <circle cx="8" cy="11" r="1" fill="#a0a0a0"/>
+                        <circle cx="10.5" cy="7" r="1" fill="#a0a0a0"/>
+                        <circle cx="14" cy="9" r="1" fill="#a0a0a0"/>
                     </svg>
                 </a>
             """ if info_url else ""
