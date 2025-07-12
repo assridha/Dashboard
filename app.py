@@ -82,8 +82,8 @@ def get_data():
     Leverage_1yr_range_min = Leverage_1yr_range.min()
 
     output = [
-        {"id": 1, "title": "Price Quantile ", "info_url": "https://example.com/price-quantile", "range_min": 0, "range_max": 100, "bar_start": quantile_index_1yr_range_min, "bar_end": quantile_index_1yr_range_max, "start_value": quantile_index_30d_prior, "current_value": quantile_index_latest, "suffix": "%"},
-        {"id": 2, "title": "Momentum Z-Index", "info_url": "https://example.com/momentum", "range_min": -3, "range_max": 3, "bar_start": plrr_1yr_range_min, "bar_end": plrr_1yr_range_max, "start_value": plrr_30d_prior, "current_value": plrr_latest},
+        {"id": 1, "title": "Price Index", "info_url": "https://example.com/price-quantile", "range_min": 0, "range_max": 100, "bar_start": quantile_index_1yr_range_min, "bar_end": quantile_index_1yr_range_max, "start_value": quantile_index_30d_prior, "current_value": quantile_index_latest, "suffix": "%"},
+        {"id": 2, "title": "Momentum Index", "info_url": "https://example.com/momentum", "range_min": -3.1, "range_max": 3.1, "bar_start": plrr_1yr_range_min, "bar_end": plrr_1yr_range_max, "start_value": plrr_30d_prior, "current_value": plrr_latest},
         {"id": 3, "title": "Volatility", "info_url": "https://example.com/volatility", "range_min": 0, "range_max": 100, "bar_start": volatility_1yr_range_min, "bar_end": volatility_1yr_range_max, "start_value": volatility_30d_prior, "current_value": volatility_latest, "suffix": "%"}
         # {"id": 4, "title": "Optimal Leverage", "info_url": "https://example.com/leverage", "range_min": 0.0, "range_max": 2.3, "bar_start": Leverage_1yr_range_min, "bar_end": Leverage_1yr_range_max, "start_value": Leverage_30d_prior, "current_value": Leverage_latest, "suffix": "x"},
         # {"id": 5, "title": "MVRV", "info_url": "https://example.com/mvrv", "range_min": 0.5, "range_max": 3.5, "bar_start": 1.8, "bar_end": 2.5, "start_value": 2.5, "current_value": 1.8},
@@ -213,7 +213,7 @@ def create_range_bar_chart(range_min, range_max, bar_start, bar_end, start_value
 
     fig.update_layout(
         height=90,
-        margin=dict(l=1, r=1, t=1, b=30),
+        margin=dict(l=1, r=1, t=1, b=40),
         paper_bgcolor="white",
         plot_bgcolor="white",
         xaxis=dict(
@@ -223,7 +223,7 @@ def create_range_bar_chart(range_min, range_max, bar_start, bar_end, start_value
             range=[padded_min, padded_max],
             ticks="outside",
             tickcolor='lightgrey',
-            tickfont=dict(size=10, color='grey'),
+            tickfont=dict(size=15, color='grey'),
             tickformat=tick_format
         ),
         yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, range=[-0.2, 0.8]),
@@ -258,6 +258,19 @@ st.markdown("""
         .stMainBlockContainer {
             padding: 0px;
         }
+        .chart-icon-link {
+            cursor: pointer;
+        }
+        .chart-icon-link:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.1);
+        }
+        .chart-icon-link:hover .chart-icon path {
+            stroke: #666666;
+        }
+        .chart-icon-link:hover .chart-icon circle {
+            fill: #666666;
+        }
     </style>
     """, unsafe_allow_html=True)
 
@@ -276,8 +289,8 @@ for metric in data:
         with col1:
             info_url = metric.get("info_url")
             info_icon_html = f"""
-                <a href="{info_url}" target="_blank" style="text-decoration: none; padding: 4px 0px;">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <a href="{info_url}" target="_blank" class="chart-icon-link" style="text-decoration: none; padding: 6px; border-radius: 4px; display: inline-block; transition: all 0.2s ease;">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="chart-icon">
                         <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h11A1.5 1.5 0 0 1 15 2.5v11a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 13.5v-11z" fill="none" stroke="#a0a0a0" stroke-width="1"/>
                         <path d="M3 12l2.5-3L8 11l2.5-4L14 9" fill="none" stroke="#a0a0a0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         <circle cx="5.5" cy="9" r="1" fill="#a0a0a0"/>
@@ -290,13 +303,13 @@ for metric in data:
             
             st.markdown(f"""
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style='font-size: clamp(0.9rem, 1.2vw, 1.1rem); font-weight: bold; text-align: left;'>{metric['title']}</span>
+                    <span style='font-size: clamp(1.1rem, 1.5vw, 1.4rem); font-weight: bold; text-align: left;'>{metric['title']}</span>
                     {info_icon_html}
                 </div>
             """, unsafe_allow_html=True)
         
         with col2:
-            st.markdown(f"<p style='font-size: clamp(1.2rem, 2vw, 2.2rem); text-align: center;'>{metric['current_value']:.{precision}f}{suffix}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='font-size: clamp(1.8rem, 3vw, 3.2rem); text-align: center;'>{metric['current_value']:.{precision}f}{suffix}</p>", unsafe_allow_html=True)
 
         with col3:
             # Calculate absolute change
@@ -307,7 +320,7 @@ for metric in data:
             color = "green" if absolute_change >= 0 else "red"
             symbol = "▲" if absolute_change >= 0 else "▼"
             
-            st.markdown(f"<p style='font-size: clamp(0.8rem, 1.2vw, 1.0rem); color: {color}; text-align: center;'>{symbol} {absolute_change:.{precision}f}{suffix}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='font-size: clamp(0.8rem, 1.2vw, 1.0rem); color: {color}; text-align: center;'>{symbol} {absolute_change:.{precision}f}{suffix} (30d)</p>", unsafe_allow_html=True)
 
 
         with col4:
@@ -359,4 +372,14 @@ with st.container(border=True):
     <div style="width: 80px; height: 20px; background: #E8E8E8; border-radius: 10px;"></div>
     <span>Max Range</span>
 </div>
-        """, unsafe_allow_html=True) 
+        """, unsafe_allow_html=True)
+
+# Add explanatory note below legend
+st.markdown("""
+<div style="text-align: center; padding: 15px; margin-top: 10px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #007bff;">
+    <p style="margin: 0; font-size: 0.9rem; color: #6c757d; line-height: 1.4;">
+        <strong>Note:</strong> These risk metrics give an indication of Bitcoin's current valuation. 
+        The higher the value, the higher the risk of owning Bitcoin.
+    </p>
+</div>
+""", unsafe_allow_html=True) 
