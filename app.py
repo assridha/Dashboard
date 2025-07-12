@@ -258,6 +258,25 @@ st.markdown("""
         .stMainBlockContainer {
             padding: 0px;
         }
+        /* Hide Streamlit toolbar */
+        .stAppToolbar {
+            visibility: hidden;
+        }
+        /* Hide hamburger menu */
+        .stAppHeader {
+            visibility: hidden;
+        }
+        /* Hide "Made with Streamlit" footer */
+        footer {
+            visibility: hidden;
+        }
+        /* Alternative selectors for different Streamlit versions */
+        header[data-testid="stHeader"] {
+            visibility: hidden;
+        }
+        div[data-testid="stToolbar"] {
+            visibility: hidden;
+        }
         .chart-icon-link {
             cursor: pointer;
         }
@@ -271,69 +290,49 @@ st.markdown("""
         .chart-icon-link:hover .chart-icon circle {
             fill: #666666;
         }
-        .help-tooltip {
+        .info-tooltip {
             position: relative;
-            display: inline-block;
             cursor: help;
-            margin-left: 8px;
+            z-index: 1001;
+            padding: 4px;
+            display: inline-block;
         }
-        .help-tooltip .tooltip-text {
-            visibility: hidden;
-            width: 350px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 10px;
+        .info-tooltip::after {
+            content: attr(data-tooltip);
             position: absolute;
-            z-index: 1;
-            bottom: 125%;
+            bottom: 150%;
             left: 50%;
-            margin-left: -175px;
+            transform: translateX(-50%);
+            background-color: white;
+            color: #333;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
             opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 14px;
-            line-height: 1.4;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            pointer-events: none;
+            max-width: 300px;
+            white-space: normal;
+            width: max-content;
         }
-        .help-tooltip .tooltip-text::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #333 transparent transparent transparent;
-        }
-        .help-tooltip:hover .tooltip-text {
-            visibility: visible;
+        .info-tooltip:hover::after {
             opacity: 1;
-        }
-        .title-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
+            visibility: visible;
         }
     </style>
     """, unsafe_allow_html=True)
 
 st.markdown("""
-    <div class="title-container">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
         <span style="margin: 0; font-size: 1.875rem; font-weight: 600; color: rgb(49, 51, 63);">Risk Metrics</span>
-        <div class="help-tooltip">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" stroke="#666" stroke-width="2"/>
-                <path d="M9.09 8.5a3 3 0 1 1 5.83 1c0 2-3 3-3 3" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M12 17h.01" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span class="tooltip-text">
-                <strong>Risk Metrics Explanation:</strong><br/>
-                These risk metrics give an indication of Bitcoin's current valuation. 
-                The higher the value, the higher the risk of owning Bitcoin.
-            </span>
-        </div>
+        <span class="info-tooltip" data-tooltip="These indicators help assess Bitcoin's investment risk based on price, return, and volatility patterns. Higher values suggest increased caution may be warranted, while lower values may indicate more favorable conditions." style="color: #666; font-size: 1.2rem;">ℹ️</span>
     </div>
-    """, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # Fetch data
 data = get_data()
@@ -348,15 +347,8 @@ for metric in data:
         with col1:
             info_url = metric.get("info_url")
             info_icon_html = f"""
-                <a href="{info_url}" target="_blank" class="chart-icon-link" style="text-decoration: none; padding: 6px; border-radius: 4px; display: inline-block; transition: all 0.2s ease;">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="chart-icon">
-                        <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h11A1.5 1.5 0 0 1 15 2.5v11a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 13.5v-11z" fill="none" stroke="#a0a0a0" stroke-width="1"/>
-                        <path d="M3 12l2.5-3L8 11l2.5-4L14 9" fill="none" stroke="#a0a0a0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="5.5" cy="9" r="1" fill="#a0a0a0"/>
-                        <circle cx="8" cy="11" r="1" fill="#a0a0a0"/>
-                        <circle cx="10.5" cy="7" r="1" fill="#a0a0a0"/>
-                        <circle cx="14" cy="9" r="1" fill="#a0a0a0"/>
-                    </svg>
+                <a href="{info_url}" target="_blank" class="chart-icon-link" style="text-decoration: none; padding: 6px; border-radius: 4px; display: inline-block; transition: all 0.2s ease; font-size: 16px;">
+                    📈
                 </a>
             """ if info_url else ""
             
