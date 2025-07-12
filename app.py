@@ -82,9 +82,9 @@ def get_data():
     Leverage_1yr_range_min = Leverage_1yr_range.min()
 
     output = [
-        {"id": 1, "title": "Price Index", "info_url": "https://example.com/price-quantile", "range_min": 0, "range_max": 100, "bar_start": quantile_index_1yr_range_min, "bar_end": quantile_index_1yr_range_max, "start_value": quantile_index_30d_prior, "current_value": quantile_index_latest, "suffix": "%"},
-        {"id": 2, "title": "Momentum Index", "info_url": "https://example.com/momentum", "range_min": -3.1, "range_max": 3.1, "bar_start": plrr_1yr_range_min, "bar_end": plrr_1yr_range_max, "start_value": plrr_30d_prior, "current_value": plrr_latest},
-        {"id": 3, "title": "Volatility", "info_url": "https://example.com/volatility", "range_min": 0, "range_max": 100, "bar_start": volatility_1yr_range_min, "bar_end": volatility_1yr_range_max, "start_value": volatility_30d_prior, "current_value": volatility_latest, "suffix": "%"}
+        {"id": 1, "title": "Price Index", "info_url": "/posts/power-law-price-and-return-index/", "range_min": 0, "range_max": 100, "bar_start": quantile_index_1yr_range_min, "bar_end": quantile_index_1yr_range_max, "start_value": quantile_index_30d_prior, "current_value": quantile_index_latest, "suffix": "%"},
+        {"id": 2, "title": "Return Index", "info_url": "/posts/power-law-price-and-return-index/", "range_min": -3.1, "range_max": 3.1, "bar_start": plrr_1yr_range_min, "bar_end": plrr_1yr_range_max, "start_value": plrr_30d_prior, "current_value": plrr_latest},
+        {"id": 3, "title": "Volatility", "info_url": "/posts/modeling-bitcoin-volatility-using-garch/", "range_min": 0, "range_max": 100, "bar_start": volatility_1yr_range_min, "bar_end": volatility_1yr_range_max, "start_value": volatility_30d_prior, "current_value": volatility_latest, "suffix": "%"}
         # {"id": 4, "title": "Optimal Leverage", "info_url": "https://example.com/leverage", "range_min": 0.0, "range_max": 2.3, "bar_start": Leverage_1yr_range_min, "bar_end": Leverage_1yr_range_max, "start_value": Leverage_30d_prior, "current_value": Leverage_latest, "suffix": "x"},
         # {"id": 5, "title": "MVRV", "info_url": "https://example.com/mvrv", "range_min": 0.5, "range_max": 3.5, "bar_start": 1.8, "bar_end": 2.5, "start_value": 2.5, "current_value": 1.8},
     ]
@@ -300,7 +300,7 @@ st.markdown("""
         .info-tooltip::after {
             content: attr(data-tooltip);
             position: absolute;
-            bottom: 150%;
+            top: 150%;
             left: 50%;
             transform: translateX(-50%);
             background-color: white;
@@ -320,7 +320,22 @@ st.markdown("""
             white-space: normal;
             width: max-content;
         }
-        .info-tooltip:hover::after {
+        .info-tooltip::before {
+            content: "";
+            position: absolute;
+            top: 130%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 6px solid white;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .info-tooltip:hover::after,
+        .info-tooltip:hover::before {
             opacity: 1;
             visibility: visible;
         }
@@ -360,7 +375,7 @@ for metric in data:
             """, unsafe_allow_html=True)
         
         with col2:
-            st.markdown(f"<p style='font-size: clamp(1.8rem, 3vw, 3.2rem); text-align: center;'>{metric['current_value']:.{precision}f}{suffix}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='font-size: clamp(1.4rem, 2.2vw, 2.4rem); text-align: center;'>{metric['current_value']:.{precision}f}{suffix}</p>", unsafe_allow_html=True)
 
         with col3:
             # Calculate absolute change
