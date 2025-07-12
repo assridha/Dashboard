@@ -271,10 +271,69 @@ st.markdown("""
         .chart-icon-link:hover .chart-icon circle {
             fill: #666666;
         }
+        .help-tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            margin-left: 8px;
+        }
+        .help-tooltip .tooltip-text {
+            visibility: hidden;
+            width: 350px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -175px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .help-tooltip .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+        .help-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        .title-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
     </style>
     """, unsafe_allow_html=True)
 
-st.subheader("Risk Metrics")
+st.markdown("""
+    <div class="title-container">
+        <span style="margin: 0; font-size: 1.875rem; font-weight: 600; color: rgb(49, 51, 63);">Risk Metrics</span>
+        <div class="help-tooltip">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="#666" stroke-width="2"/>
+                <path d="M9.09 8.5a3 3 0 1 1 5.83 1c0 2-3 3-3 3" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 17h.01" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="tooltip-text">
+                <strong>Risk Metrics Explanation:</strong><br/>
+                These risk metrics give an indication of Bitcoin's current valuation. 
+                The higher the value, the higher the risk of owning Bitcoin.
+            </span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # Fetch data
 data = get_data()
@@ -374,12 +433,4 @@ with st.container(border=True):
 </div>
         """, unsafe_allow_html=True)
 
-# Add explanatory note below legend
-st.markdown("""
-<div style="text-align: center; padding: 15px; margin-top: 10px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #007bff;">
-    <p style="margin: 0; font-size: 0.9rem; color: #6c757d; line-height: 1.4;">
-        <strong>Note:</strong> These risk metrics give an indication of Bitcoin's current valuation. 
-        The higher the value, the higher the risk of owning Bitcoin.
-    </p>
-</div>
-""", unsafe_allow_html=True) 
+ 
