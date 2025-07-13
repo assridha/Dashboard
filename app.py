@@ -335,9 +335,26 @@ st.markdown("""
             transition: opacity 0.3s, visibility 0.3s;
         }
         .info-tooltip:hover::after,
-        .info-tooltip:hover::before {
+        .info-tooltip:hover::before,
+        .info-tooltip:focus::after,
+        .info-tooltip:focus::before,
+        .info-tooltip:active::after,
+        .info-tooltip:active::before {
             opacity: 1;
             visibility: visible;
+        }
+        
+        /* Mobile touch support */
+        @media (hover: none) and (pointer: coarse) {
+            .info-tooltip {
+                -webkit-tap-highlight-color: transparent;
+            }
+            .info-tooltip::after {
+                transition: opacity 0.1s, visibility 0.1s;
+            }
+            .info-tooltip::before {
+                transition: opacity 0.1s, visibility 0.1s;
+            }
         }
     </style>
     """, unsafe_allow_html=True)
@@ -345,7 +362,7 @@ st.markdown("""
 st.markdown("""
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
         <span style="margin: 0; font-size: 1.875rem; font-weight: 600; color: rgb(49, 51, 63);">Risk Metrics</span>
-        <span class="info-tooltip" data-tooltip="These indicators help assess Bitcoin's investment risk based on price, return, and volatility patterns. Higher values suggest increased caution may be warranted, while lower values may indicate more favorable conditions." style="color: #666; font-size: 1.2rem;">ℹ️</span>
+        <span class="info-tooltip" data-tooltip="These indicators help assess Bitcoin's investment risk based on price, return, and volatility patterns. Higher values suggest increased caution may be warranted, while lower values may indicate more favorable conditions." style="color: #666; font-size: 1.2rem;" tabindex="0">ℹ️</span>
     </div>
 """, unsafe_allow_html=True)
 
