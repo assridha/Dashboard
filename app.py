@@ -457,4 +457,28 @@ with st.container(border=True):
 </div>
         """, unsafe_allow_html=True)
 
+st.html("""
+<script>
+function sendHeight() {
+  const height = document.body.scrollHeight;
+  // The targetOrigin MUST match your Jekyll site's URL for security
+  // For local testing, you can use "*" but it's not recommended for production
+  const targetOrigin = "https://assridha.github.io"; 
+  window.parent.postMessage({ height: height }, targetOrigin);
+}
+
+// Send height on initial load and whenever the content changes.
+// Using MutationObserver is the most reliable way.
+const observer = new MutationObserver(sendHeight);
+observer.observe(document.body, {
+  attributes: true, 
+  childList: true, 
+  subtree: true 
+});
+
+// Also send height on load as a fallback
+window.addEventListener('load', sendHeight);
+</script>
+""")
+
  
