@@ -25,6 +25,7 @@ def get_rounding_precision(range_min, range_max):
 
 
 # --- Data Simulation ---
+@st.cache_data(ttl=600)
 def get_data():
     
     # Get data from API
