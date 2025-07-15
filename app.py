@@ -304,12 +304,12 @@ st.markdown("""
             top: 150%;
             left: 50%;
             transform: translateX(-50%);
-            background-color: white;
-            color: #333;
+            background-color: #333;
+            color: #fff;
             padding: 8px 12px;
             border-radius: 4px;
-            border: 1px solid #ddd;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid #555;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
             font-size: 12px;
             white-space: nowrap;
             z-index: 1000;
@@ -329,7 +329,7 @@ st.markdown("""
             transform: translateX(-50%);
             border-left: 6px solid transparent;
             border-right: 6px solid transparent;
-            border-bottom: 6px solid white;
+            border-bottom: 6px solid #333;
             z-index: 1001;
             opacity: 0;
             visibility: hidden;
@@ -363,7 +363,13 @@ st.markdown("""
 st.markdown("""
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
         <span style="margin: 0; font-size: 1.875rem; font-weight: 600; color: rgb(49, 51, 63);">Risk Metrics</span>
-        <span class="info-tooltip" data-tooltip="These indicators help assess Bitcoin's investment risk based on price, return, and volatility patterns. Higher values suggest increased caution may be warranted, while lower values may indicate more favorable conditions." style="color: #666; font-size: 1.2rem;" tabindex="0">ℹ️</span>
+        <span class="info-tooltip" data-tooltip="These indicators help assess Bitcoin's investment risk based on price, return, and volatility patterns. Higher values suggest increased caution may be warranted, while lower values may indicate more favorable conditions." style="color: #666; font-size: 1.2rem;" tabindex="0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+        </span>
     </div>
 """, unsafe_allow_html=True)
 
