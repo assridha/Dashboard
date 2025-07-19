@@ -83,9 +83,9 @@ def get_data():
     Leverage_1yr_range_min = Leverage_1yr_range.min()
 
     output = [
-        {"id": 1, "title": "Price Index", "info_url": "/posts/power-law-price-and-return-index/", "range_min": 0, "range_max": 100, "bar_start": quantile_index_1yr_range_min, "bar_end": quantile_index_1yr_range_max, "start_value": quantile_index_30d_prior, "current_value": quantile_index_latest, "suffix": "%"},
-        {"id": 2, "title": "Return Index", "info_url": "/posts/power-law-price-and-return-index/", "range_min": -3.1, "range_max": 3.1, "bar_start": plrr_1yr_range_min, "bar_end": plrr_1yr_range_max, "start_value": plrr_30d_prior, "current_value": plrr_latest},
-        {"id": 3, "title": "Volatility", "info_url": "/posts/modeling-bitcoin-volatility-using-garch/", "range_min": 0, "range_max": 100, "bar_start": volatility_1yr_range_min, "bar_end": volatility_1yr_range_max, "start_value": volatility_30d_prior, "current_value": volatility_latest, "suffix": "%"}
+        {"id": 1, "title": "Price Index", "info_url": "https://metashwin.com/posts/power-law-price-and-return-index/", "range_min": 0, "range_max": 100, "bar_start": quantile_index_1yr_range_min, "bar_end": quantile_index_1yr_range_max, "start_value": quantile_index_30d_prior, "current_value": quantile_index_latest, "suffix": "%"},
+        {"id": 2, "title": "Return Index", "info_url": "https://metashwin.com/posts/power-law-price-and-return-index/", "range_min": -3.1, "range_max": 3.1, "bar_start": plrr_1yr_range_min, "bar_end": plrr_1yr_range_max, "start_value": plrr_30d_prior, "current_value": plrr_latest},
+        {"id": 3, "title": "Volatility", "info_url": "https://metashwin.com/posts/modeling-bitcoin-volatility-using-garch/", "range_min": 0, "range_max": 100, "bar_start": volatility_1yr_range_min, "bar_end": volatility_1yr_range_max, "start_value": volatility_30d_prior, "current_value": volatility_latest, "suffix": "%"}
         # {"id": 4, "title": "Optimal Leverage", "info_url": "https://example.com/leverage", "range_min": 0.0, "range_max": 2.3, "bar_start": Leverage_1yr_range_min, "bar_end": Leverage_1yr_range_max, "start_value": Leverage_30d_prior, "current_value": Leverage_latest, "suffix": "x"},
         # {"id": 5, "title": "MVRV", "info_url": "https://example.com/mvrv", "range_min": 0.5, "range_max": 3.5, "bar_start": 1.8, "bar_end": 2.5, "start_value": 2.5, "current_value": 1.8},
     ]
@@ -291,6 +291,17 @@ st.markdown("""
         .chart-icon-link:hover .chart-icon circle {
             fill: #666666;
         }
+        .metric-container {
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .metric-container:hover {
+            background-color: #f8f8f8;
+        }
+        .stMarkdown a {
+            text-decoration: none !important;
+        }
         .info-tooltip {
             position: relative;
             cursor: help;
@@ -378,28 +389,25 @@ data = get_data()
 
 # Loop through data and create a bordered container for each metric
 for metric in data:
+    info_url = metric.get("info_url")
+    
+    if info_url:
+        st.markdown(f"""
+            <a href="{info_url}" target="_blank" class="metric-container" style="display: block; color: inherit;">
+        """, unsafe_allow_html=True)
+    
     with st.container(border=True):
         col1, col2, col3, col4 = st.columns([2.5, 1, 1, 6.5], vertical_alignment="center")
         suffix = metric.get("suffix", "")
         precision = get_rounding_precision(metric['range_min'], metric['range_max'])
 
         with col1:
-            info_url = metric.get("info_url")
-            info_icon_html = f"""
-                <a href="{info_url}" target="_blank" class="chart-icon-link" style="text-decoration: none; padding: 6px; border-radius: 4px; display: inline-block; transition: all 0.2s ease; font-size: 16px;">
-                    📈
-                </a>
-            """ if info_url else ""
-            
             st.markdown(f"""
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style='font-size: clamp(1.1rem, 1.5vw, 1.4rem); font-weight: bold; text-align: left;'>{metric['title']}</span>
-                    {info_icon_html}
-                </div>
+                <span style='font-size: clamp(1.1rem, 1.5vw, 1.4rem); font-weight: bold; text-align: left;'>{metric['title']}</span>
             """, unsafe_allow_html=True)
         
         with col2:
-            st.markdown(f"<p style='font-size: clamp(1.4rem, 2.2vw, 2.4rem); text-align: center;'>{metric['current_value']:.{precision}f}{suffix}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='font-size: clamp(1.4rem, 2.2vw, 2.4rem); text-align: center; margin: 0;'>{metric['current_value']:.{precision}f}{suffix}</p>", unsafe_allow_html=True)
 
         with col3:
             # Calculate absolute change
@@ -410,8 +418,7 @@ for metric in data:
             color = "green" if absolute_change >= 0 else "red"
             symbol = "▲" if absolute_change >= 0 else "▼"
             
-            st.markdown(f"<p style='font-size: clamp(0.8rem, 1.2vw, 1.0rem); color: {color}; text-align: center;'>{symbol} {absolute_change:.{precision}f}{suffix} (30d)</p>", unsafe_allow_html=True)
-
+            st.markdown(f"<p style='font-size: clamp(0.8rem, 1.2vw, 1.0rem); color: {color}; text-align: center; margin: 0;'>{symbol} {absolute_change:.{precision}f}{suffix} (30d)</p>", unsafe_allow_html=True)
 
         with col4:
             chart = create_range_bar_chart(
@@ -421,7 +428,10 @@ for metric in data:
                 metric["current_value"],
                 suffix=suffix
             )
-            st.plotly_chart(chart, use_container_width=True, config={'displayModeBar': False}) 
+            st.plotly_chart(chart, use_container_width=True, config={'displayModeBar': False})
+    
+    if info_url:
+        st.markdown("</a>", unsafe_allow_html=True)
 
 # --- Legend ---
 with st.container(border=True):
