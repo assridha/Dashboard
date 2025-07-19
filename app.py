@@ -389,30 +389,28 @@ data = get_data()
 
 # Loop through data and create a bordered container for each metric
 for metric in data:
-    info_url = metric.get("info_url")
-    
     with st.container(border=True):
-        if info_url:
-            st.markdown("""
-                <style>
-                    div.stContainer:hover {
-                        background-color: #f8f8f8;
-                        cursor: pointer;
-                    }
-                </style>
-            """, unsafe_allow_html=True)
-            
-        col1, col2, col3, col4, col5 = st.columns([2.3, 1, 1, 6.2, 0.5], vertical_alignment="center")
+        col1, col2, col3, col4 = st.columns([2.5, 1, 1, 6.5], vertical_alignment="center")
         suffix = metric.get("suffix", "")
         precision = get_rounding_precision(metric['range_min'], metric['range_max'])
 
         with col1:
+            info_url = metric.get("info_url")
+            info_icon_html = f"""
+                <a href="{info_url}" target="_blank" class="chart-icon-link" style="text-decoration: none; padding: 6px; border-radius: 4px; display: inline-block; transition: all 0.2s ease; font-size: 16px;">
+                    📈
+                </a>
+            """ if info_url else ""
+            
             st.markdown(f"""
-                <span style='font-size: clamp(1.1rem, 1.5vw, 1.4rem); font-weight: bold; text-align: left;'>{metric['title']}</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style='font-size: clamp(1.1rem, 1.5vw, 1.4rem); font-weight: bold; text-align: left;'>{metric['title']}</span>
+                    {info_icon_html}
+                </div>
             """, unsafe_allow_html=True)
         
         with col2:
-            st.markdown(f"<p style='font-size: clamp(1.4rem, 2.2vw, 2.4rem); text-align: center; margin: 0;'>{metric['current_value']:.{precision}f}{suffix}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='font-size: clamp(1.4rem, 2.2vw, 2.4rem); text-align: center;'>{metric['current_value']:.{precision}f}{suffix}</p>", unsafe_allow_html=True)
 
         with col3:
             # Calculate absolute change
@@ -423,7 +421,7 @@ for metric in data:
             color = "green" if absolute_change >= 0 else "red"
             symbol = "▲" if absolute_change >= 0 else "▼"
             
-            st.markdown(f"<p style='font-size: clamp(0.8rem, 1.2vw, 1.0rem); color: {color}; text-align: center; margin: 0;'>{symbol} {absolute_change:.{precision}f}{suffix} (30d)</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='font-size: clamp(0.8rem, 1.2vw, 1.0rem); color: {color}; text-align: center;'>{symbol} {absolute_change:.{precision}f}{suffix} (30d)</p>", unsafe_allow_html=True)
 
         with col4:
             chart = create_range_bar_chart(
@@ -434,37 +432,6 @@ for metric in data:
                 suffix=suffix
             )
             st.plotly_chart(chart, use_container_width=True, config={'displayModeBar': False})
-            
-        with col5:
-            if info_url:
-                st.markdown("""
-                    <style>
-                        div[data-testid="stVerticalBlock"] > div:has(button) {
-                            height: 100%;
-                            display: flex;
-                            align-items: center;
-                        }
-                        .stButton > button {
-                            background: none;
-                            border: none;
-                            padding: 0;
-                            color: #666;
-                            font-size: 1.2em;
-                        }
-                        .stButton > button:hover {
-                            color: #333;
-                            background: none;
-                            border: none;
-                        }
-                        .stButton > button:active, .stButton > button:focus {
-                            color: #333;
-                            background: none;
-                            border: none;
-                            box-shadow: none;
-                        }
-                    </style>
-                """, unsafe_allow_html=True)
-                st.link_button("ℹ️", info_url, help="Click for more information")
 
 # --- Legend ---
 with st.container(border=True):
