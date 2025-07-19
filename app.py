@@ -392,27 +392,17 @@ for metric in data:
     info_url = metric.get("info_url")
     
     with st.container(border=True):
-        # Make the container clickable
         if info_url:
-            st.markdown(f"""
+            st.markdown("""
                 <style>
-                    div.stContainer:hover {{
+                    div.stContainer:hover {
                         background-color: #f8f8f8;
                         cursor: pointer;
-                    }}
+                    }
                 </style>
-                <script>
-                    // Add click handler to container
-                    const container = document.querySelector('.stContainer');
-                    if (container) {{
-                        container.addEventListener('click', () => {{
-                            window.open('{info_url}', '_blank');
-                        }});
-                    }}
-                </script>
             """, unsafe_allow_html=True)
-        
-        col1, col2, col3, col4 = st.columns([2.5, 1, 1, 6.5], vertical_alignment="center")
+            
+        col1, col2, col3, col4, col5 = st.columns([2.3, 1, 1, 6.2, 0.5], vertical_alignment="center")
         suffix = metric.get("suffix", "")
         precision = get_rounding_precision(metric['range_min'], metric['range_max'])
 
@@ -444,6 +434,37 @@ for metric in data:
                 suffix=suffix
             )
             st.plotly_chart(chart, use_container_width=True, config={'displayModeBar': False})
+            
+        with col5:
+            if info_url:
+                st.markdown("""
+                    <style>
+                        div[data-testid="stVerticalBlock"] > div:has(button) {
+                            height: 100%;
+                            display: flex;
+                            align-items: center;
+                        }
+                        .stButton > button {
+                            background: none;
+                            border: none;
+                            padding: 0;
+                            color: #666;
+                            font-size: 1.2em;
+                        }
+                        .stButton > button:hover {
+                            color: #333;
+                            background: none;
+                            border: none;
+                        }
+                        .stButton > button:active, .stButton > button:focus {
+                            color: #333;
+                            background: none;
+                            border: none;
+                            box-shadow: none;
+                        }
+                    </style>
+                """, unsafe_allow_html=True)
+                st.link_button("ℹ️", info_url, help="Click for more information")
 
 # --- Legend ---
 with st.container(border=True):
