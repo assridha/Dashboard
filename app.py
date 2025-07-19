@@ -391,12 +391,27 @@ data = get_data()
 for metric in data:
     info_url = metric.get("info_url")
     
-    if info_url:
-        st.markdown(f"""
-            <a href="{info_url}" target="_blank" class="metric-container" style="display: block; color: inherit;">
-        """, unsafe_allow_html=True)
-    
     with st.container(border=True):
+        # Make the container clickable
+        if info_url:
+            st.markdown(f"""
+                <style>
+                    div.stContainer:hover {{
+                        background-color: #f8f8f8;
+                        cursor: pointer;
+                    }}
+                </style>
+                <script>
+                    // Add click handler to container
+                    const container = document.querySelector('.stContainer');
+                    if (container) {{
+                        container.addEventListener('click', () => {{
+                            window.open('{info_url}', '_blank');
+                        }});
+                    }}
+                </script>
+            """, unsafe_allow_html=True)
+        
         col1, col2, col3, col4 = st.columns([2.5, 1, 1, 6.5], vertical_alignment="center")
         suffix = metric.get("suffix", "")
         precision = get_rounding_precision(metric['range_min'], metric['range_max'])
@@ -429,9 +444,6 @@ for metric in data:
                 suffix=suffix
             )
             st.plotly_chart(chart, use_container_width=True, config={'displayModeBar': False})
-    
-    if info_url:
-        st.markdown("</a>", unsafe_allow_html=True)
 
 # --- Legend ---
 with st.container(border=True):
