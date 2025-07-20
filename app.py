@@ -7,6 +7,7 @@ import json
 import pandas as pd
 import math
 from datetime import datetime
+import streamlit.components.v1 as components
 
 def get_rounding_precision(range_min, range_max):
     """
@@ -473,3 +474,10 @@ with st.container(border=True):
     <span>Max Range</span>
 </div>
         """, unsafe_allow_html=True)
+
+components.html("""
+    <script type="text/javascript" src="https://ssl.gstatic.com/trends_nrtr/4116_RC01/embed_loader.js"></script>
+    <script type="text/javascript">
+    trends.embed.renderExploreWidget("TIMESERIES", {"comparisonItem":[{"keyword":"/m/05p0rrx","geo":"","time":"today 5-y"}],"category":0,"property":""}, {"exploreQuery":"date=today%205-y&q=%2Fm%2F05p0rrx&hl=en-GB","guestPath":"https://trends.google.com:443/trends/embed/"});
+    </script>
+""", height=450)
